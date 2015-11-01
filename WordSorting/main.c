@@ -30,10 +30,11 @@ void usage() {
 int main(int argc, char * argv[]) {
 
 	/*
-	 *We accept if and only if we have at most 3 options: 1 for max length, 1 for min length
-	 *and 1 for sorting type.
+	 * We accept if and only if we have at most 3 options: 1 for max length, 
+	 * 1 for min length
+	 * and 1 for sorting type.
 	 *
-	 *We also want atleast one argument so we make sure argc>1
+	 * We also want atleast one argument so we make sure argc>1
 	 */
 
 	if (argc>7) {
@@ -127,7 +128,8 @@ int main(int argc, char * argv[]) {
 		pch = strtok(NULL," ");
 	}
 
-	sort(arr, num_words, options.freq, options.alpha, options.length, sizeof(*arr));
+	sort(arr, num_words, options.freq, options.alpha, 
+		options.length, sizeof(*arr));
 
 	struct winsize w;
 
@@ -142,5 +144,7 @@ int main(int argc, char * argv[]) {
 	//prevent double deallocation, just in case
 	para = 0;
 	arr = 0;
+
+	return (0);
 
 }

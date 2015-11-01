@@ -5,7 +5,9 @@
  *
  * Helper function to insert a new word into a word array
  */
-int insert(word_t * arr, word_t new, long size, long * max_occurences) {
+int 
+insert(word_t * arr, word_t new, long size, long * max_occurences) 
+{
 	int exists =0;
 	int i=0;
 
@@ -27,7 +29,7 @@ int insert(word_t * arr, word_t new, long size, long * max_occurences) {
 		arr[i].num_occurences = 1;
 	}
 
-	return exists;
+	return (exists);
 }
 
 /*
@@ -35,16 +37,18 @@ int insert(word_t * arr, word_t new, long size, long * max_occurences) {
  *
  * Comparison function for sorting based on length
  */
-int lengthComp(const void * w1, const void * w2) {
+int 
+lengthComp(const void * w1, const void * w2) 
+{
 	word_t * wordone = (word_t *)w1;
 	word_t * wordtwo = (word_t *)w2;
 
 	if (strlen(wordone->w) < strlen(wordtwo->w))
-		return 1;
+		return (1);
 	else 
-		return -1;
+		return (-1);
 
-	return 0;
+	return (0);
 }
 
 /*
@@ -52,16 +56,18 @@ int lengthComp(const void * w1, const void * w2) {
  *
  * Comparison function for sorting based on alphabetical order
  */
-int alphaComp(const void * w1, const void * w2) {
+int 
+alphaComp(const void * w1, const void * w2) 
+{
 	word_t * wordone = (word_t *)w1;
 	word_t * wordtwo = (word_t *)w2;
 
 	if (wordone->w[0] < wordtwo->w[0])
-		return 1;
+		return (1);
 	else 
-		return -1;
+		return (-1);
 
-	return 0;
+	return (0);
 }
 
 /*
@@ -69,16 +75,18 @@ int alphaComp(const void * w1, const void * w2) {
  *
  *Comparison function for sorting based on frequency
  */
-int frequencyComp(const void * w1, const void * w2) {
+int 
+frequencyComp(const void * w1, const void * w2) 
+{
 	word_t * wordone = (word_t *)w1;
 	word_t * wordtwo = (word_t *)w2;
 
 	if (wordone->num_occurences < wordtwo->num_occurences)
-		return 1;
+		return (1);
 	else 
-		return -1;
+		return (-1);
 
-	return 0;
+	return (0);
 }
 
 /* 
@@ -86,7 +94,11 @@ int frequencyComp(const void * w1, const void * w2) {
  *
  * Wrapper for sorting function that counts the number of real elements present beforehand
  */
-int sort(word_t * arr, size_t size, int freq, int alpha, int length, size_t word_size) {
+int 
+sort(word_t * arr, size_t size, int freq, 
+	int alpha, int length, 
+	size_t word_size) 
+{
 
 	if (freq==1)
 		qsort(arr, size, word_size, frequencyComp);
@@ -95,7 +107,7 @@ int sort(word_t * arr, size_t size, int freq, int alpha, int length, size_t word
 	else
 		qsort(arr, size, word_size, lengthComp);
 
-	return 0;
+	return (0);
 
 }
 
@@ -104,7 +116,9 @@ int sort(word_t * arr, size_t size, int freq, int alpha, int length, size_t word
  *
  *Helper function that prints <length> number of hashes
  */
-void printHashes(long length) {
+void 
+printHashes(long length) 
+{
 
 	for (int i=0; i < length; i++) {
 		printf("#");
@@ -116,7 +130,12 @@ void printHashes(long length) {
  *
  *Prints the histogram for word occurence
  */
-void printHistogram(word_t * arr, size_t size, struct winsize w, long max_occurences) {
+void 
+printHistogram(word_t * arr, size_t size, 
+	struct winsize w, 
+	long max_occurences) 
+{
+
 	for (int i=0; i < size; i++) {
 		printf("%s|", arr[i].w);
 

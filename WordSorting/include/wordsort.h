@@ -5,7 +5,7 @@
 */
 
 #ifndef _WORDSORT_H
-#define _WORDSORT_H
+#define 	_WORDSORT_H
 
 
 #include <stdio.h>
@@ -25,10 +25,6 @@ extern "C" {
 	char * w;
 	long num_occurences;
 } word_t;
-
-//No other structures, definitions, or global variables to declare
-
-//Functions
 
 /*
  * int insert(word arr[], word new, size_t size)
@@ -62,9 +58,12 @@ int frequencyComp(const void * w1, const void * w2);
 /* 
  * int sort()
  *
- * Wrapper for sorting function that counts the number of real elements present beforehand
+ * Wrapper for sorting function that counts the number of real elements 
+ * present beforehand
  */
-int sort(word_t * arr, size_t size, int freq, int alpha, int length, size_t word_size); 
+int sort(word_t * arr, size_t size, int freq, 
+	int alpha, int length, 
+	size_t word_size); 
 
 /*
  *printHashes(long length)
@@ -79,7 +78,9 @@ void printHashes(long length);
  *
  *Prints the histogram for word occurence
  */
-void printHistogram(word_t * arr, size_t size, struct winsize w, long max_occurences);
+void printHistogram(word_t * arr, size_t size, 
+	struct winsize w, 
+	long max_occurences);
 
 
 #ifdef _cplusplus
