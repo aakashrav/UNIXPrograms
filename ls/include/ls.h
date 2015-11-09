@@ -36,8 +36,3 @@ int
 print_file_information_long(const char * file);
 
 #endif /* LS_H */
-
-
-
-
-
