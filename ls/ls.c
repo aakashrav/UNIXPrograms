@@ -39,6 +39,7 @@ get_directory_files(const char * dir_path,
 		}
 
 	}
+	closedir(directory);
 	return (0);
 }
 

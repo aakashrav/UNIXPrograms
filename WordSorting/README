@@ -1,0 +1,9 @@
+The Assignment:
+
+2-1) Write a program which reads stdin and prints how many times each word was present on stdin
+2-2) Print a histogram like this:
+word |####         | 20
+2-3) Parse arguments (like -m -n) and count only words of the length <m, n>
+2-4) Add optional (based on options) sorting based on frequency (number how many times the word appeared on stdin), alphabetical (ascending, descending) and length of the words
+
+This is more about training programming in C and making sure you are familiar with common C functions like sort(), strlen(), strcmp(), pointers etc.

@@ -1,0 +1,5 @@
+The Assignment:
+
+1. Write a program which receives a directory path as an argument (optional, cwd if not present). Program walks the directory structure at given path (including subdirs recursively) and computes the average length of all the files it finds. Then it prints the names and length of all files longer than the average length.
+
+2. The same, but for each directory a child process is created. That one counts the average size of the files and sends it back to its parent via a named pipe (a separate pipe for each subprocesser based on mktemp).
