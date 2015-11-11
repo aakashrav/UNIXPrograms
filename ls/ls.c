@@ -5,42 +5,55 @@
 #include "ls.h"
 
 /*
+ * Indicate to the compiler that there is an external directory
+ * size variable
+ */
+ extern long CURRENT_DIRECTORY_SIZE;
+
+/*
  * get_directory_files()
  *
  * Helper function to retrieve a list of dirent structs 
  * and add them to dir_files
  */
-int
-get_directory_files(const char * dir_path,
-	struct dirent * dir_files,
-	size_t * size)
+struct dirent *
+get_directory_files(const char * dir_path)
 {
+	size_t size = INITIAL_DIRECTORY_SIZE;
+	struct dirent * dir_files = 
+		malloc(sizeof(struct dirent) * INITIAL_DIRECTORY_SIZE);
+
 	DIR * directory = opendir(dir_path);
-	if (directory == NULL)
-		return -1;
 	struct dirent * temp;
+
 	if (directory)
 	{
 		int index = 0;
 		while((temp = readdir(directory)) != NULL)
 		{
-			if (index < *size)
+			if (index < size)
 			{
 				dir_files[index] = *temp;
+				CURRENT_DIRECTORY_SIZE++;
 			}
 			else 
 			{
-				dir_files = realloc(dir_files, (sizeof(dir_files[0]) * (*size + REALLOC_SIZE)) );
+				dir_files = realloc(dir_files, (sizeof(dir_files[0]) * (size + REALLOC_SIZE)) );
 				dir_files[index] = *temp;
-				*size += REALLOC_SIZE;
+				size += REALLOC_SIZE;
+				// Cache the new size so that main can know what the size is
+				CURRENT_DIRECTORY_SIZE = size;
 			}
 
 			index++;
 		}
 
 	}
+	else
+		return NULL;
+
 	closedir(directory);
-	return (0);
+	return (dir_files);
 }
 
 /*
@@ -49,11 +62,14 @@ get_directory_files(const char * dir_path,
  * Prints information about the file a la 'ls -l'
  */
 int
-print_file_information_long(const char * dir_file)
+print_file_information_long(const char * dir_name, const char * dir_file)
 {
 	struct stat file;
+
 	if ( stat(dir_file, &file) < 0)
-		return -1;
+	{
+		return (-1);
+	}
 
 	//Print file mode
 	printf("%c", (S_ISDIR(file.st_mode) ? 'd' : '-'));
@@ -105,7 +121,7 @@ print_file_information_long(const char * dir_file)
 
 	//Finally, print file path
 	printf("%s\n", dir_file);
-
+	
 	return (0);
 
 

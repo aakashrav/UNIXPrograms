@@ -15,6 +15,9 @@
 #include <pwd.h>
 #include <time.h>
 #include <stdio.h>
+#include <limits.h>
+#include <string.h>
+#include <stdlib.h>
 
 // Some helper values
 #define		TRUE 1
@@ -26,13 +29,13 @@
  * Gets a list of files in a specified directory and returns the 
  * dirent structure for them in a clean array
  */
-int
-get_directory_files(const char * dir_path, struct dirent * dir_files, size_t * size);
+struct dirent *
+get_directory_files(const char * dir_path);
 
 /*
  * Simply prints the ls -l information for a given file
  */
 int
-print_file_information_long(const char * file);
+print_file_information_long(const char * dir_name, const char * file);
 
 #endif /* LS_H */
