@@ -66,7 +66,12 @@ print_file_information_long(const char * dir_name, const char * dir_file)
 {
 	struct stat file;
 
-	if ( stat(dir_file, &file) < 0)
+	char * fullpath = malloc(strlen(dir_name) + strlen(dir_file) +1);
+	strcat(fullpath, dir_name);
+	strcat(fullpath, "/");
+	strcat(fullpath, dir_file);
+
+	if ( stat(fullpath, &file) < 0)
 	{
 		return (-1);
 	}
@@ -85,7 +90,7 @@ print_file_information_long(const char * dir_name, const char * dir_file)
 	printf(" ");
 
 	//Get number of hard links to this file
-	printf("%d ", file.st_nlink);
+	printf("%5d ", file.st_nlink);
 
 	/* 
 	 * Get uid, and determine who this uid belongs to 
@@ -103,7 +108,7 @@ print_file_information_long(const char * dir_name, const char * dir_file)
 	printf("%s ", group_info->gr_name);
 
 	//Print the size in bytes
-	printf("%lld ", file.st_size);
+	printf("%8lld ", file.st_size);
 
 	//Print the time of last modification
 	time_t time_mod = file.st_mtime;
@@ -113,11 +118,11 @@ print_file_information_long(const char * dir_name, const char * dir_file)
 	 */
 	struct tm * time_mod_local = localtime(&time_mod);
 	//Print the modification time month
-	printf("%d ", time_mod_local->tm_mon);
+	printf("%2d ", time_mod_local->tm_mon);
 	//Print the modification time day
-	printf("%d ", time_mod_local->tm_mday);
+	printf("%2d ", time_mod_local->tm_mday);
 	//Print minutes and seconds
-	printf("%d:%d ", time_mod_local->tm_min, time_mod_local->tm_sec);
+	printf("%2d:%2d ", time_mod_local->tm_min, time_mod_local->tm_sec);
 
 	//Finally, print file path
 	printf("%s\n", dir_file);

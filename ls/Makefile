@@ -1,16 +1,16 @@
 SOURCE=main.c ls.c
 OBJECTS=$(SOURCE:.c=.o)
 CC=gcc
-CFLAGS=-c -I./include -MP -MMD
+CFLAGS=-c -Wall -I./include -MP -MMD
 
 all: ls
 
 ls: $(OBJECTS)
-	@$(CC) $(OBJECTS) -o ls
+	$(CC) $(OBJECTS) -o ls
 	@echo Successful linking
 
 .c.o:
-	@$(CC) $(CFLAGS) $<
+	$(CC) $(CFLAGS) $<
 	@echo Successful compilation
 
 -include $(SOURCE:.c=.d)
