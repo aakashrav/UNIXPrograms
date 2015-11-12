@@ -47,7 +47,7 @@ int main(int argc, char * argv[])
 			fflush(stdout);
 			if ( print_file_information_long(pathname, directory_files[j].d_name) < 0)
 			{
-				perror("Error reading file: ");
+				perror("Error reading file");
 				printf("File name: %s%c%s\n", pathname, '/', directory_files[j].d_name);
 				continue;
 			}
