@@ -66,7 +66,12 @@ print_file_information_long(const char * dir_name, const char * dir_file)
 {
 	struct stat file;
 
-	char * fullpath = (char *) malloc(strlen(dir_name) + strlen(dir_file) + 2);
+	// Reallocate directory name for local usage
+	char * dir_name_copy = (char *)malloc(strlen(dir_name) +1);
+	strcpy(dir_name_copy, dir_name);
+
+	// Create a full path name with directory name and file name
+	char * fullpath = (char *) malloc(strlen(dir_name_copy) + strlen(dir_file) + 2);
 	strcat(fullpath, dir_name);
 	strcat(fullpath, "/");
 	strcat(fullpath, dir_file);
@@ -74,6 +79,7 @@ print_file_information_long(const char * dir_name, const char * dir_file)
 	if ( stat(fullpath, &file) < 0)
 	{
 		free(fullpath);
+		free(dir_name_copy);
 		return (-1);
 	}
 
@@ -128,9 +134,8 @@ print_file_information_long(const char * dir_name, const char * dir_file)
 	//Finally, print file path
 	printf("%s\n", dir_file);
 
-	/* HERE IS THE ERROR, UNCOMMENT AND IT THROWS A FREE ERROR! */
-	// free(fullpath);
-	fullpath=0;
+	free(fullpath);
+	free(dir_name_copy);
 	
 	return (0);
 
