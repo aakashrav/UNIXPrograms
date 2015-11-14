@@ -2,20 +2,35 @@
 
 int main(int argc, char * argv[])
 {
-	if (argc < 2)
+	const char * pathname;
+
+	if (argc >= 2)
 	{
-		printf("Usage averageLS <pathname>");
+		pathname = argv[1];
+	}
+	else
+		pathname = getenv("PWD");
+
+	int * info = malloc(2*sizeof(int));
+	info[0] = 0;
+	info[1] = 0;
+
+	int i = recursive_search(pathname, info);
+	if (i < 0)
+	{
+		return -1;
+	}
+
+	int average = info[0]/info[1];
+
+	printf("Starting printing of files, average length of name: %d\n", average);
+	fflush(stdout);
+
+	if ( (i = print_files_with_long_names(pathname, average)) < 0)
+	{
+		free(info);
 		return 1;
 	}
 
-	long numFiles;
-	long totalFileNameLength;
-
-	int total_info[2] = recursive_search(argv[1]);
-
-	int average = total_info[1]/total_info[2];
-
-	print_files_with_long_names(argv[1], average);
-
-
+	free(info);
 }
