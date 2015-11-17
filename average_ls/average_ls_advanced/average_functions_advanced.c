@@ -1,4 +1,5 @@
 #include "average_functions_advanced.h"
+
 // int
 // print_files_with_long_names(const char * pathname, int average)
 // {
@@ -89,8 +90,8 @@ recursive_search(char * pathname, const char * final_fifo_name)
 	if (pid == 0)
 	{
 
-		char * arg[] = {executable, pathname, RECURSION_FIFO_PATH, NULL};
-		if ( execv(fullpath, arg) < 0)
+		char * arg[] = {executable, fullpath, pathname, RECURSION_FIFO_PATH, NULL};
+		if (execv(fullpath, arg) < 0)
 			exit(1);
 		return 0;
 		

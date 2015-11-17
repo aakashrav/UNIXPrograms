@@ -16,10 +16,12 @@ static int CURRENT_RECURSION_COUNT;
 
 int main(int argc, char * argv[])
 {
-	char * pathname = argv[1];
-	char * fifo = argv[2];
-	if (argc > 3)
-		CURRENT_RECURSION_COUNT = atoi(argv[3]);
+	char * EXEC_PATH = argv[1];
+	char * pathname = argv[2];
+	char * fifo = argv[3];
+
+	if (argc > 4)
+		CURRENT_RECURSION_COUNT = atoi(argv[4]);
 	else
 		CURRENT_RECURSION_COUNT = 0;
 
@@ -82,22 +84,19 @@ int main(int argc, char * argv[])
 
 		if (S_ISDIR(file.st_mode) && (CURRENT_RECURSION_COUNT <= MAXIMUM_RECURSION))
 		{
-			char * exec_path = malloc(strlen(getenv("PWD")) + strlen("/recursive_searcher") +1);
-			strcat(exec_path, getenv("PWD"));
-			strcat(exec_path, "/recursive_searcher");
 			char int_to_str[5];
 			sprintf(int_to_str, "%d", CURRENT_RECURSION_COUNT);
-			char * arg[] = {"recursive_searcher", pathname, fifo, int_to_str};
+			char * arg[] = {"recursive_searcher", EXEC_PATH, fullpath, fifo, int_to_str, NULL};
 
 			pid_t pid = fork();
 
 			if (pid == 0)
 			{
-				if ( execv(exec_path, arg) < 0)
+				if ( execv(EXEC_PATH, arg) < 0)
 				{
-					exit(1);
-					printf("Error on exec recursive directories");
+					perror("Error on exec recursive directories");
 					fflush(stdout);
+					exit(1);
 				}
 			}
 			else
@@ -108,7 +107,6 @@ int main(int argc, char * argv[])
 				{
 					free(fullpath);
 					free(pathname_copy);
-					free(exec_path);
 					CURRENT_RECURSION_COUNT++;
 					continue;
 				}
@@ -118,7 +116,6 @@ int main(int argc, char * argv[])
 					fflush(stdout);
 					free(fullpath);
 					free(pathname_copy);
-					free(exec_path);
 					continue;
 				}
 			}	

@@ -28,22 +28,23 @@ int main(int argc, char * argv[])
 	size_t buf_size = 5;
 	size_t read;
 
+	int count = 0;
+	int average = 0;
+	int temp = 0;
+
 	while ( (read = getline(&buf, &buf_size, stream)) != -1)
 	{
-		printf("%s", buf);
+		temp = atoi(buf);
+		average+=temp;
+		count++;
 	}
+
+	average /= count;
+	printf("\n\n");
+	printf("Average length of file names: %D\n", average);
+	printf("Starting printing of file names above average...\n");
+
 
 	free(buf);
 
-
-	// int average = info[0]/info[1];
-
-	// printf("Starting printing of files, average length of name: %d\n", average);
-	// fflush(stdout);
-
-	// if ( (i = print_files_with_long_names(pathname, average)) < 0)
-	// {
-	// 	free(info);
-	// 	return 1;
-	// }
 }

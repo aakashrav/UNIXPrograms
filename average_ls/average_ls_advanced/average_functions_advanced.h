@@ -9,16 +9,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
 int
 print_files_with_long_names(const char * pathname, int average);
 
 int
-recursive_search(const char * pathname, int * average_info);
+recursive_search(char * pathname, const char * final_fifo_name);
 
 
 #endif
