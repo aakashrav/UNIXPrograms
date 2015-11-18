@@ -1,8 +1,18 @@
+/*
+ * This file implements functions defined in average_funcitons.h. It helps provide recursive
+ * directory searching and printing of file names.
+ */
+
 #include "average_functions.h"
 
 const long MAX_NUMBER_RECURSIVE_DIRECTORIES =2;
 long CURRENT_RECURSION_COUNT=0;
 
+/*
+ * print_files_with_long_names(const char * pathname, int average)
+ * 
+ * Print all files that have filename length above the average
+ */
 int
 print_files_with_long_names(const char * pathname, int average)
 {
@@ -15,7 +25,7 @@ print_files_with_long_names(const char * pathname, int average)
 	if (directory == NULL)
 	{
 		perror("Error fetching directory");
-		return -1;
+		return (-1);
 	}
 
 	struct dirent * temp;
@@ -29,11 +39,11 @@ print_files_with_long_names(const char * pathname, int average)
 		struct stat file;
 
 		// Create a local copy of the pathname for local usage
-		char * pathname_copy = (char *)malloc(strlen(pathname) +1 );
+		char * pathname_copy = (char *)calloc(strlen(pathname) +1, 1);
 		strcpy(pathname_copy, pathname);
 
 		// Create a string for the full path of the file or directory
-		char * fullpath = malloc(strlen(pathname_copy) + strlen(temp->d_name) +1);
+		char * fullpath = calloc(strlen(pathname_copy) + strlen(temp->d_name) +1,1);
 		strcat(fullpath, pathname_copy);
 		strcat(fullpath, "/");
 		strcat(fullpath, temp->d_name);
@@ -68,6 +78,12 @@ print_files_with_long_names(const char * pathname, int average)
 	return (0);
 }
 
+/*
+ * recursive_search(const char * pathname, int * average_info)
+ *
+ * Recursively search the directory specified by pathname and find the average
+ * length of file names in that directory.
+ */
 int
 recursive_search(const char * pathname, int * average_info)
 {
@@ -80,7 +96,7 @@ recursive_search(const char * pathname, int * average_info)
 	{
 		perror("ERROR loading directory");
 		printf("Directory name: %s\n", pathname);
-		return -1;
+		return (-1);
 	}
 
 	struct dirent * temp;
@@ -94,11 +110,11 @@ recursive_search(const char * pathname, int * average_info)
 			continue;
 
 		// Create a local copy of the pathname for local usage
-		char * pathname_copy = (char *)malloc(strlen(pathname) +1 );
+		char * pathname_copy = (char *)calloc(strlen(pathname) +1,1);
 		strcpy(pathname_copy, pathname);
 
 		// Create a string for the full path of the file/directory
-		char * fullpath = malloc(strlen(pathname_copy) + strlen(temp->d_name) + 2);
+		char * fullpath = calloc(strlen(pathname_copy) + strlen(temp->d_name) + 2,1);
 		strcat(fullpath, pathname_copy);
 		strcat(fullpath, "/");
 		strcat(fullpath, temp->d_name);

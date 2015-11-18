@@ -5,9 +5,9 @@ RECURSIVE_OBJECTS=$(RECURSIVE_SOURCES:.c=.o)
 CC=gcc
 CFLAGS=-c -Wall -I./include -MP -MMD
 
-all: main recursive_searcher
+all: averageLSAdvanced recursive_searcher
 
-main: $(MAIN_OBJECTS)
+averageLSAdvanced: $(MAIN_OBJECTS)
 	$(CC) $(MAIN_OBJECTS) -o $@
 	@echo Successfully linked main!
 
@@ -24,7 +24,7 @@ recursive_searcher: $(RECURSIVE_OBJECTS)
 clean:
 	@rm $(MAIN_OBJECTS) $(RECURSIVE_OBJECTS) \
 	$(MAIN_SOURCES:.c=.d) $(RECURSIVE_SOURCES:.c=.d) \
-	main recursive_searcher
+	averageLSAdvanced recursive_searcher
 	@echo Successfull clean
 
 .PHONY: all clean

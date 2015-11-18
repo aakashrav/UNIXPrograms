@@ -1,3 +1,9 @@
+/*
+ * Main logic behind the averageLSAdvanced program. First calls recursive_search to find
+ * information on the average length of file names, then calls
+ * print_files_with_long_names to print file names that are above the average.
+ */
+
 #include "average_functions_advanced.h"
 
 const char * FIFONAME = "/tmp/averageLSfifo";
@@ -16,7 +22,7 @@ int main(int argc, char * argv[])
 	mkfifo(FIFONAME, 0664);
 	int fd = open(FIFONAME, O_RDONLY | O_NONBLOCK);
 
-	int i = recursive_search(pathname, FIFONAME);
+	int i = recursive_search(pathname, FIFONAME,0,0);
 	if (i < 0)
 	{
 		perror("Error on recursive search");
@@ -43,6 +49,13 @@ int main(int argc, char * argv[])
 	printf("\n\n");
 	printf("Average length of file names: %D\n", average);
 	printf("Starting printing of file names above average...\n");
+
+	i = recursive_search(pathname, FIFONAME, 1, average);
+	if (i < 0)
+	{
+		perror("Error on printing recursion");
+		return -1;
+	}
 
 
 	free(buf);

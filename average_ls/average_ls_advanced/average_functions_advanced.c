@@ -1,72 +1,20 @@
 #include "average_functions_advanced.h"
 
-// int
-// print_files_with_long_names(const char * pathname, int average)
-// {
-// 	// Reset current recursion level to 0
-// 	CURRENT_RECURSION_COUNT =0;
-
-// 	DIR * directory;
-// 	directory = opendir(pathname);
-
-// 	if (directory == NULL)
-// 	{
-// 		perror("Error fetching directory");
-// 		return -1;
-// 	}
-
-// 	struct dirent * temp;
-
-// 	while ((temp = readdir(directory)) != NULL)
-// 	{
-// 		// Prevent infinite recursion by disallowing special directory names
-// 		if ( !(strcmp(temp->d_name,".")) || !(strcmp(temp->d_name,"..")) )
-// 			continue;
-
-// 		struct stat file;
-
-// 		// Create a local copy of the pathname for local usage
-// 		char * pathname_copy = (char *)malloc(strlen(pathname) +1 );
-// 		strcpy(pathname_copy, pathname);
-
-// 		// Create a string for the full path of the file or directory
-// 		char * fullpath = malloc(strlen(pathname_copy) + strlen(temp->d_name) +1);
-// 		strcat(fullpath, pathname_copy);
-// 		strcat(fullpath, "/");
-// 		strcat(fullpath, temp->d_name);
-
-// 		if ( stat(fullpath, &file) < 0 )
-// 		{
-// 			perror("Error reading file: ");
-// 			printf("File name : %s\n", fullpath);
-// 			free(fullpath);
-// 			free(pathname_copy);
-// 			continue;
-// 		}
-
-// 		if (S_ISDIR(file.st_mode) && CURRENT_RECURSION_COUNT < MAX_NUMBER_RECURSIVE_DIRECTORIES)
-// 		{
-// 			print_files_with_long_names(fullpath, average);
-// 			free(fullpath);
-// 			free(pathname_copy);
-// 			CURRENT_RECURSION_COUNT++;
-// 			continue;
-// 		}
-
-// 		if (strlen(temp->d_name) > average)
-// 			printf("%s\n", temp->d_name);
-
-// 		free(fullpath);
-// 		free(pathname_copy);
-
-// 	}
-
-// 	closedir(directory);
-// 	return (0);
-// }
-
+/*
+ * recursive_search(char *, const char *, int, int)
+ *
+ * This function is the intial point for the recursive logic for
+ * averageLSAdvanced. It intializes the FIFO for the recursion 
+ * (the local var RECURSION_FIFO_PATH), sets the PRINT_FLAG
+ * (if needed), and then calls the recursive_searcher logic
+ * to perform the real hardwork. When the recursive_searcher returns,
+ * this function takes the data from the searcher and gives it back
+ * to the caller in a separate fifo specified by final_fifo_name.
+ * This allows the separation of recurser logic with the caller's logic.
+ */
 int
-recursive_search(char * pathname, const char * final_fifo_name)
+recursive_search(char * pathname, const char * final_fifo_name, 
+	int print_flag, int average_filename_length)
 {
 	char * RECURSION_FIFO_PATH = "/tmp/averageLSfifoRECURSION";
 
@@ -77,23 +25,47 @@ recursive_search(char * pathname, const char * final_fifo_name)
 	int recursive_fd;
 
 	if ( (recursive_fd = open(RECURSION_FIFO_PATH, O_RDONLY | O_NONBLOCK)) < 0)
+	{
+		perror("Error opening fifo for final recursive output");
+		fflush(stdout);
 		return -1;
+	}
 
 	char * cwd = getenv("PWD");
 	char * executable = "/recursive_searcher";
-	char * fullpath = malloc(strlen(cwd) + strlen(executable) +1);
+	char * fullpath = calloc((strlen(cwd) + strlen(executable) +1),1);
+
 	strcat(fullpath, cwd);
 	strcat(fullpath, executable);
+
+	char temp_average_buf[5];
+	sprintf(temp_average_buf, "%d", average_filename_length);
 
 	pid_t pid = fork();
 
 	if (pid == 0)
 	{
+		char * arg[8];
+		arg[0] = executable;
+		arg[1] = fullpath;
+		arg[2] = pathname;
+		arg[3] = RECURSION_FIFO_PATH;
+		arg[4] = "0";
+		arg[6] = temp_average_buf;
+		arg[7] = NULL;
+		if (print_flag)
+			arg[5] = "1";
+		else
+			arg[5] = "0";
 
-		char * arg[] = {executable, fullpath, pathname, RECURSION_FIFO_PATH, NULL};
 		if (execv(fullpath, arg) < 0)
+		{
+			perror("Error execing initial recursion :");
+			printf("\nexecpath: %s%s\n%s \n", cwd, executable, fullpath);
+			free(fullpath);
+			fflush(stdout);
 			exit(1);
-		return 0;
+		}
 		
 	}
 	else
@@ -104,26 +76,33 @@ recursive_search(char * pathname, const char * final_fifo_name)
 		pid_temp = waitpid(pid, &status, 0);
 		if (status == 0)
 		{
-			// First create a stream for the recursive file info
-			FILE * file_info = fdopen(recursive_fd, "r");
-
-			// Create a buffer for reading lines from the file
-			char * buf = malloc(5);
-			size_t buf_size = 5;
-			size_t read;
-
-			// Then create a stream for the file we will be outputting to
-			int output_fd = open(final_fifo_name, O_WRONLY);
-			FILE * output = fdopen(output_fd, "a");
-
-			while ( (read = getline(&buf, &buf_size, file_info)) != -1)
+			if (!print_flag)
 			{
-				fputs(buf,output);
-				fflush(output);
+				// First create a stream for the recursive file info
+				FILE * file_info = fdopen(recursive_fd, "r");
+
+				// Create a buffer for reading lines from the file
+				char * buf = malloc(5);
+				size_t buf_size = 5;
+				size_t read;
+
+				// Then create a stream for the file we will be outputting to
+				int output_fd = open(final_fifo_name, O_WRONLY);
+				FILE * output = fdopen(output_fd, "a");
+
+				/* 
+				 * Output the information from the recuser's logic to the 
+				 * caller's logic.
+				 */
+				while ( (read = getline(&buf, &buf_size, file_info)) != -1)
+				{
+					fputs(buf,output);
+					fflush(output);
+				}
+				free(buf);
 			}
 
 			free(fullpath);
-			free(buf);
 			unlink(RECURSION_FIFO_PATH);
 			return 0;	
 		}
@@ -131,8 +110,13 @@ recursive_search(char * pathname, const char * final_fifo_name)
 		{
 			free(fullpath);
 			unlink(RECURSION_FIFO_PATH);
+			perror("Recursive function failed");
+			fflush(stdout);
 			return -1;
 		}
 	}
 
+	//Final unlink just to be safe
+	unlink(RECURSION_FIFO_PATH);
+	return 0;
 }

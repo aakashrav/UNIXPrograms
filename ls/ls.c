@@ -67,11 +67,11 @@ print_file_information_long(const char * dir_name, const char * dir_file)
 	struct stat file;
 
 	// Reallocate directory name for local usage
-	char * dir_name_copy = (char *)malloc(strlen(dir_name) +1);
+	char * dir_name_copy = (char *)calloc(strlen(dir_name) +1,1);
 	strcpy(dir_name_copy, dir_name);
 
 	// Create a full path name with directory name and file name
-	char * fullpath = (char *) malloc(strlen(dir_name_copy) + strlen(dir_file) + 2);
+	char * fullpath = (char *) calloc(strlen(dir_name_copy) + strlen(dir_file) + 2,1);
 	strcat(fullpath, dir_name);
 	strcat(fullpath, "/");
 	strcat(fullpath, dir_file);
