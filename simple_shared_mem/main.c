@@ -120,7 +120,7 @@ int main(int argc, char * argv[])
 			sem_child.sem_op = 0;
 			if (semop(access_synchronizer, &sem_child, 1) < 0)
 				error("Error getting access_synchronizer child");
-			sem_child.sem_op = 1;
+			sem_child.sem_op = 1; 
 			if (semop(access_synchronizer, &sem_child, 1) < 0)
 				error("Error setting access_synchronizer child");
 
@@ -143,10 +143,10 @@ int main(int argc, char * argv[])
 		sem_child.sem_op = 1;
 		if (semop(end_signaller, &sem_child, 1) < 0)
 			error("Error setting end signaller child");
-		/** 
-		 * Perform one final unlocking scheme so that the parent doesn't deadlock.
-		 * A simple phony write signal/acces_synchronizer signal will suffice
-		 */
+		// /** 
+		//  * Perform one final unlocking scheme so that the parent doesn't deadlock.
+		//  * A simple phony write signal/acces_synchronizer signal will suffice
+		//  */
 		if (semctl(writesignaller, 0, SETVAL, 0) < 0)
 		{
 			error("Error setting final phony write signal child");
@@ -182,7 +182,8 @@ int main(int argc, char * argv[])
 				error("Error getting value of child's end_signaller");
 			}
 
-			if (ending == 1)
+			// We we break on the first iteration we end up writing nothing
+			if ( (ending == 1) && (j!=0) )
 				break;
 
 			printf("Parent waiting for child!\n");
@@ -210,32 +211,11 @@ int main(int argc, char * argv[])
 		if (semop(end_signaller, &sem_parent, 1) < 0)
 			error("Error setting end signaller parent");
 
-		/**
-		 * As in the child, we perform one final phony unlocking scheme
-		 * so the child will not lock
-		 */
-		if (semctl(access_synchronizer, 0, SETVAL, 0) < 0)
-		{
-			error("Error setting final phony access_synchronizer signal parent");
-		}
 		/** 
 		 * Wait for the child to finish unlocking all semaphores before we 
 		 * prematurely finish the program
 		 */
-		printf("Parent finished; waiting for child to finish\n");
-
-		int val;
-			if ( (val = semctl(access_synchronizer, 0, GETVAL)) < 0)
-			{
-				error("Error getting value of child's end_signaller");
-			}
-		printf("access_synchronizer at time of parent exit: %d\n", val);
-			if ( (val = semctl(writesignaller, 0, GETVAL)) < 0)
-			{
-				error("Error getting value of child's end_signaller");
-			}
-		printf("writesignaller at time of parent exit: %d\n", val);
-
+		printf("Parent reader finished; waiting for child to finish...\n");
 
 		fflush(stdout);
 		int status;
