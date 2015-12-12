@@ -6,6 +6,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * The name of the file we will be playing with.
+ * After running the program, please run 'cat random_file'
+ * You should see that process A and process B are writing
+ * to the file separately. That is, the lines from A don't get
+ * mixed with the lines from B, and vice versa. The lines are
+ * totally separate. Each process writes a 100 times so this should
+ * be visible
+ */
 const char * FILENAME = "random_file";
 
 void error(const char * message)
@@ -17,6 +26,7 @@ void error(const char * message)
 
 int main(int argc, char * argv[])
 {
+	/* We first unlink the file to start with a clean slate*/
 	unlink(FILENAME);
 	int fd = open(FILENAME, O_CREAT | O_RDWR);
 
@@ -30,6 +40,10 @@ int main(int argc, char * argv[])
 	{
 		for (int i = 0; i < 100; i++)
 		{
+			/* The child locks from the end of the file onwards.
+			 * At the start, the file is 0 bytes and hence this is 
+			 * equivalent to locking from the beginning onwards
+			 */
 			struct flock f1;
 			f1.l_type = F_WRLCK;
 			f1.l_whence = SEEK_END;
@@ -62,7 +76,7 @@ int main(int argc, char * argv[])
 	}
 	else
 	{
-		//Same code, but for process B
+		//Same code and logic, but for process B
 		for (int i = 0; i < 100; i++)
 		{
 			struct flock f1;
