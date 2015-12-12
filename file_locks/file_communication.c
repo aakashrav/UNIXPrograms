@@ -28,7 +28,7 @@ int main(int argc, char * argv[])
 
 	if (pid == 0)
 	{
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 100; i++)
 		{
 			struct flock f1;
 			f1.l_type = F_WRLCK;
@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
 	else
 	{
 		//Same code, but for process B
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 100; i++)
 		{
 			struct flock f1;
 			f1.l_type = F_WRLCK;
