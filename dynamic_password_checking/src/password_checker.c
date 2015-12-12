@@ -6,9 +6,9 @@ void load_plugin_names()
 {
 	char * CWD = getenv("PWD");
 
-	char * fullpath = calloc(strlen(CWD) + strlen("/lib/plugins/dict_plugin.dylib") + 1,1);
+	char * fullpath = calloc(strlen(CWD) + strlen("/lib/plugins/dict_plugin.so") + 1,1);
 	strcat(fullpath, CWD);
-	strcat(fullpath, "/lib/plugins/dict_plugin.dylib");
+	strcat(fullpath, "/lib/plugins/dict_plugin.so");
 	PLUGINS[0] = fullpath;
 }
 

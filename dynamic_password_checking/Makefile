@@ -17,7 +17,7 @@ libraries:
 clean:
 	rm tester
 	rm tester.d
-	rm ./lib/password_checker.dylib
-	rm ./lib/plugins/dict_plugin.dylib
+	rm ./lib/password_checker.so
+	rm ./lib/plugins/dict_plugin.so
 
 .PHONY: all clean

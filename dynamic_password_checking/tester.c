@@ -6,9 +6,9 @@ void load_plugin_names()
 {
 	char * CWD = getenv("PWD");
 	char * fullpath = calloc(strlen(CWD) + 
-		+ strlen("/lib/password_checker.dylib") + 1,1);
+		+ strlen("/lib/password_checker.so") + 1,1);
 	strcat(fullpath, CWD);
-	strcat(fullpath, "/lib/password_checker.dylib");
+	strcat(fullpath, "/lib/password_checker.so");
 	TESTER_PLUGIN = fullpath;
 }
 
