@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-shared -I../include/
+CFLAGS=-Wall -std=c99 -fPIC -shared -I../include/
 
 all: password_checker common_passwords
 

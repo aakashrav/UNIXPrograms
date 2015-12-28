@@ -2,22 +2,24 @@ MAKE=make
 TESTER_SOURCES=tester.c
 TESTER_OBJECTS=$(TESTER_SOURCES:.c=.o)
 CC=gcc
-CFLAGS=-I./include/ -MP -MMD
+CFLAGS=-Wall -std=c99 -I./include/ -MP -MMD
+LDLFLAGS=-ldl
 
 all: libraries tester
 
-tester: $(TESTER_SOURCES) $(PLUGIN_LIBRARIES)
-	$(CC) $(CFLAGS) $< -o $@
-	@Echo finished building tester!
+tester: $(TESTER_SOURCES)
+	$(CC) $(CFLAGS) $(LDLFLAGS) $< -o $@
+	@echo finished building tester!
 
 libraries:
+	mkdir ./lib
+	mkdir ./lib/plugins
 	$(MAKE) -C ./src/
-	@Echo finished building libraries!
+	@echo finished building libraries!
 
 clean:
-	rm tester
-	rm tester.d
-	rm ./lib/password_checker.so
-	rm ./lib/plugins/dict_plugin.so
+	rm -f tester
+	rm -f tester.d
+	rm -rf ./lib
 
 .PHONY: all clean

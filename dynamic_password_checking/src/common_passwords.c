@@ -3,7 +3,8 @@
 const char * COMMON_PASSWORDS[] = {"password","1234","abcd","badpassword"};
 const int NUM_COMMON_PASSWORDS = 4;
 
-int check_common_password(const char * password)
+static int 
+check_common_password(const char * password)
 {
 	int common_password_check = 0;
 
@@ -25,4 +26,4 @@ int check_common_password(const char * password)
 
 }
 
-pwq_t dict_plugin = {check_common_password};
+pwq_t common_password_check_plugin = {check_common_password};
