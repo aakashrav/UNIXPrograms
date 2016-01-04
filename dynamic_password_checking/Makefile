@@ -8,7 +8,7 @@ LDLFLAGS=-ldl
 all: libraries tester
 
 tester: $(TESTER_SOURCES)
-	$(CC) $(CFLAGS) $(LDLFLAGS) $< -o $@
+	$(CC) $(CFLAGS) -L./lib/ -lpassword_checker $< -o $@
 	@echo finished building tester!
 
 libraries:
