@@ -1,0 +1,8 @@
+The current directory has a bunch of subdirectories in the form of:
+hostname@port (eg. u-pl0.ms.mff.cuni.cz@2525)
+
+each of the directories contains more subdirectories in the form of:
+mailmaster@server (eg. admin@test-1.cz)
+
+Connect to each of the SMTP servers in the first subdirectories level and 
+send all emails contained in this directory to the give.
