@@ -9,57 +9,81 @@ error(const char * message)
 	exit(1);
 };
 
+/*
+ * This function takes a specific server destination address, service number (port),
+ * a message, and a socket file descriptor, and sends the requested message to the
+ * server
+ */
 void
-set_smtp_destination(struct sockaddr_in * server_address, const char * destination_addr,
-	const long port)
+set_smtp_destination_and_send(const char * destination_addr, const char * port,
+	const char * message, int sock_fd)
 {
-	memset((char *) server_address, 0, sizeof(server_address));
-
-	char * port_cstr[5];
-	sprintf(port_cstr,port,"%d");
 	struct addrinfo hints;
-	hints.ai_family = AF_INET;
+	memset((void *)&hints, 0, sizeof(hints));
+	struct sockaddr_in * sock_ipv4 = NULL;
+	struct sockaddr_in6 * sock_ipv6 = NULL;
+
+	struct addrinfo * result_iterator, * res_original;
+	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 
-	struct addrinfo * results;
+	int error_val = getaddrinfo(destination_addr, port, &hints, &res_original);
 
-	int i = getaddrinfo(destination_addr, port_cstr, &hints, &results);
-
-	server_address->sin_family = AF_INET;
-	server_address->sin_port = htons(port);
-
-	if (inet_aton(destination_addr, &(server_address->sin_addr)) == 0)
+	if (error_val!=0)
 	{
-		error("Error on network bye torder translation");
+		printf("%s\n", gai_strerror(error_val));
+		error("Error on getaddrinfo");
 	}
 
-	freeaddrinfo(results);
+	for (result_iterator = res_original; result_iterator!=NULL; result_iterator = result_iterator->ai_next)
+	{
+		if ( (result_iterator->ai_family != AF_INET) && (result_iterator->ai_family != AF_INET6) )
+			continue;
+
+		if (result_iterator->ai_family == AF_INET)
+		{
+			sock_ipv4 = (struct sockaddr_in *)result_iterator->ai_addr;
+		}
+		if (result_iterator->ai_family == AF_INET6)
+		{
+			sock_ipv6 = (struct sockaddr_in6 *)result_iterator->ai_addr;
+		}
+
+	}
+
+	if (sock_ipv4 != NULL)
+	{
+		socklen_t len = (socklen_t)sizeof(struct sockaddr_in);
+		int i = connect(sock_fd, (struct sockaddr *)sock_ipv4, len);
+		if (i == -1)
+			error("Error on connecting to server address");
+
+		char buf[strlen(message)];
+
+		sprintf(buf, message);
+		send(sock_fd, buf, strlen(message),0);	
+	}
+
+	if (sock_ipv6 != NULL)
+	{
+		socklen_t len = (socklen_t)sizeof(struct sockaddr_in6);
+		int i = connect(sock_fd, (struct sockaddr *)sock_ipv6, len);
+		if (i == -1)
+			error("Error on connecting to server address");
+
+		char buf[strlen(message)];
+
+		sprintf(buf, message);
+		send(sock_fd, buf, strlen(message),0);	
+	}
+
+	freeaddrinfo(res_original);
 }
 
-void
-smtp_client_send_message(struct sockaddr_in * server_address, const char * message, int sock_fd)
-{
-	socklen_t len = (socklen_t)sizeof(*server_address);
-	int i = connect(sock_fd, (struct sockaddr *)server_address, len);
-	if (i == -1)
-		error("Error on connecting to server address");
-
-	char buf[strlen(message)];
-
-	sprintf(buf, message);
-	send(sock_fd, buf, strlen(message),0);
-}
-
-// HELO SKOZINA
-// MAIL FROM:stanislav.kozina@gmail.com
-// RCPT TO:stanislav.kozina@gmail.com
-// DATA
-// Subject: Test email
-
-// body of the email
-// .
-
+/*
+ * Returns a message in the SMTP format
+ */
 char *
 return_smtp_formatted_message(const char * MESSAGE, const char * SENDER_DOMAIN,
 	const char * MAIL_FROM, const char * RCPT_TO, const char * SUBJECT)
@@ -71,4 +95,32 @@ return_smtp_formatted_message(const char * MESSAGE, const char * SENDER_DOMAIN,
 		SENDER_DOMAIN, MAIL_FROM, RCPT_TO, SUBJECT, MESSAGE);
 
 	return smtp_message;
+}
+
+
+/*
+ * Seprates file names of type u2-0.ms.mff.cuni.cz@2526 into u2-0.ms.mff.cuni.cz
+ * and 2526, which are placed in the input parameters ip_addr, and port, respectively.
+ */
+void
+separate_ip_and_port(char * ip_addr, char * port, const char * combined_addr)
+{
+	char * port_loc= strchr(combined_addr, '@');
+	// Go back till we see a '/' character, this is the start of the server address
+	char * ip_start_location = port_loc;
+	while (*ip_start_location != '/')
+	{
+		ip_start_location--;
+	}
+	// Go to the starting location of ip address
+	ip_start_location++;
+	// Get the length of the server address by pointer arithmetic
+	long len_of_address = port_loc - ip_start_location;
+	// Go to the starting point of the port
+	port_loc+=1;
+	// Copy the port first
+    strcpy(port, port_loc);
+    // Then copy the server address
+    strncpy(ip_addr, ip_start_location, (size_t)len_of_address);
+
 }

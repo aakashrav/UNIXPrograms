@@ -1,9 +1,13 @@
 #include "walk_directory.h"
 #include "smtp_client.h"
 
+/*
+ * Extensible funciton that takes as input a directory name, and for each file encountered,
+ * calls (*file_function_t), and for each directory encountered, calls (*directory_function_t)
+ */
 void
-perform_on_current_directory(const char * dir_name, void (*directory_function_t)(const char *), 
-	void (*file_function_t)(const char *, const char *))
+perform_on_current_directory(const char * dir_name, int (*directory_function_t)(const char *), 
+	int (*file_function_t)(const char *, const char *))
 {
 	DIR * d;
 
@@ -52,8 +56,6 @@ perform_on_current_directory(const char * dir_name, void (*directory_function_t)
 
 		if ( S_ISDIR(file.st_mode) )
 		{
-			printf("Adding to directory\n");
-			fflush(stdout);
 			directory_function_t(name);
 		}
 		else

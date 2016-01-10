@@ -10,12 +10,6 @@ int (*password_check)(const char *);
 
 extern pwq_t password_check_plugin;
 
-void dynliberror(const char * message)
-{
-	printf("%s",dlerror());
-	exit(1);
-}
-
 int is_directory(const char * path)
 {
 	struct stat library_file_stat;
