@@ -8,4 +8,8 @@
 typedef struct pwq
 {
 	int(*some_password_check)(const char *);
+	const char * error_message;
 } pwq_t;
+
+int
+check(const char * password);

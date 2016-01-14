@@ -109,8 +109,10 @@ do_file(const char * file_name, const char * file_path)
 		"aakash_ravi@hotmail.com",file_name,"New Message!");
 
 
-	char * host_name = calloc(NI_MAXHOST, 1);
-	char * service_name = calloc(NI_MAXSERV, 1);
+	// char * host_name = calloc(NI_MAXHOST, 1);
+	// char * service_name = calloc(NI_MAXSERV, 1);
+	char * host_name = calloc(256, 1);
+	char * service_name = calloc(256, 1);
 
 	/* The directory name contains the IP address and port of the mailserver
 	 * together, so we separate them.

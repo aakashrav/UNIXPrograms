@@ -6,23 +6,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-int (*password_check)(const char *);
-
-extern pwq_t password_check_plugin;
-
-int is_directory(const char * path)
-{
-	struct stat library_file_stat;
-	stat(path, &library_file_stat);
-	return S_ISDIR(library_file_stat.st_mode);
-}
-
-void 
-load_plugins()
-{
-	password_check = password_check_plugin.some_password_check;
-}
-
 int
 main (int argc, char * argv[])
 {
@@ -35,9 +18,6 @@ main (int argc, char * argv[])
 
 	char * password = argv[1];
 
-	load_plugins();
-
-	password_check(password);
+	check(password);
 	return 0;
-
 }

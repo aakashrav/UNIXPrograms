@@ -14,7 +14,7 @@ else:
 	$(CC) $(CFLAGS) -o $<
 
 send_mails: $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@
+	$(CC) -o $@ $(OBJECTS)
 
 clean:
 	rm -rf $(OBJECTS)

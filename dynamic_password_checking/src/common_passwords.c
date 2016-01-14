@@ -21,9 +21,9 @@ check_common_password(const char * password)
 	{
 		return -1;
 	}
-
+	
 	return 0;
 
 }
 
-pwq_t common_password_check_plugin = {check_common_password};
+pwq_t password_check = {check_common_password, "Your password is too short!"};

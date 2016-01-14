@@ -20,8 +20,10 @@ set_smtp_destination_and_send(const char * destination_addr, const char * port,
 {
 	struct addrinfo hints;
 	memset((void *)&hints, 0, sizeof(hints));
-	struct sockaddr_in * sock_ipv4 = NULL;
-	struct sockaddr_in6 * sock_ipv6 = NULL;
+	// struct sockaddr_in * sock_ipv4 = NULL;
+	// struct sockaddr_in6 * sock_ipv6 = NULL;
+	int ipv4=0;
+	int ipv6=0;
 
 	struct addrinfo * result_iterator, * res_original;
 	hints.ai_family = AF_UNSPEC;
@@ -40,22 +42,28 @@ set_smtp_destination_and_send(const char * destination_addr, const char * port,
 	{
 		if ( (result_iterator->ai_family != AF_INET) && (result_iterator->ai_family != AF_INET6) )
 			continue;
+		else if (result_iterator->ai_family == AF_INET)
+			ipv4=1;
+		else
+			ipv6=1;
 
-		if (result_iterator->ai_family == AF_INET)
-		{
-			sock_ipv4 = (struct sockaddr_in *)result_iterator->ai_addr;
-		}
-		if (result_iterator->ai_family == AF_INET6)
-		{
-			sock_ipv6 = (struct sockaddr_in6 *)result_iterator->ai_addr;
-		}
+		break;
+
+		// if (result_iterator->ai_family == AF_INET)
+		// {
+		// 	sock_ipv4 = (struct sockaddr_in *)result_iterator->ai_addr;
+		// }
+		// if (result_iterator->ai_family == AF_INET6)
+		// {
+		// 	sock_ipv6 = (struct sockaddr_in6 *)result_iterator->ai_addr;
+		// }
 
 	}
 
-	if (sock_ipv4 != NULL)
+	if (ipv4 == 1)
 	{
 		socklen_t len = (socklen_t)sizeof(struct sockaddr_in);
-		int i = connect(sock_fd, (struct sockaddr *)sock_ipv4, len);
+		int i = connect(sock_fd, result_iterator->ai_addr, len);
 		if (i == -1)
 			error("Error on connecting to server address");
 
@@ -64,11 +72,10 @@ set_smtp_destination_and_send(const char * destination_addr, const char * port,
 		sprintf(buf, message);
 		send(sock_fd, buf, strlen(message),0);	
 	}
-
-	if (sock_ipv6 != NULL)
+	else if (ipv6 == 1)
 	{
 		socklen_t len = (socklen_t)sizeof(struct sockaddr_in6);
-		int i = connect(sock_fd, (struct sockaddr *)sock_ipv6, len);
+		int i = connect(sock_fd, result_iterator->ai_addr, len);
 		if (i == -1)
 			error("Error on connecting to server address");
 
@@ -76,6 +83,11 @@ set_smtp_destination_and_send(const char * destination_addr, const char * port,
 
 		sprintf(buf, message);
 		send(sock_fd, buf, strlen(message),0);	
+	}
+	else
+	{
+		printf("%s\n", destination_addr);
+		error("SMTP Server can't be found");
 	}
 
 	freeaddrinfo(res_original);

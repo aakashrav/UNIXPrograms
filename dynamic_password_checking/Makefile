@@ -5,15 +5,15 @@ CC=gcc
 CFLAGS=-Wall -std=c99 -I./include/ -MP -MMD
 LDLFLAGS=-ldl -lpassword_checker
 
-all: clean libraries tester
+all: libraries tester
 
-tester: $(TESTER_SOURCES)
-	$(CC) $(CFLAGS) $< -L./lib/ $(LDLFLAGS) -o $@
+tester: $(TESTER_SOURCES) libraries
+	$(CC) $(CFLAGS) -o $@ $< -L./lib/ $(LDLFLAGS)
 	@echo finished building tester!
 
 libraries:
-	mkdir ./lib
-	mkdir ./lib/plugins
+	mkdir -p ./lib
+	mkdir -p ./lib/plugins
 	$(MAKE) -C ./src/
 	@echo finished building libraries!
 
