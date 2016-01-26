@@ -1,0 +1,85 @@
+#include "pipe_functions.h"
+
+void
+error(const char * message)
+{
+	perror(message);
+	printf("Errno: %d\n", errno);
+	fflush(stdout);
+	exit(1);
+}
+
+void
+pipe_and_exec(int pipes[], const char * command, const char * command_input[])
+{
+	pid_t pid = fork();
+
+	if (pid == 1)
+		error("Error on fork");
+
+	if (pid == 0)
+	{
+		// Close the reader
+		close(pipes[0]);
+		// Duplicate standard output to the pipe
+		int i = dup2(1, pipes[1]);
+		if (i == -1)
+			error("Error on dup");
+
+		// Execute shell call
+		i = execve(command, command_input, NULL);
+		if (i==-1)
+			error("Error on execve");
+
+		exit(0);
+
+	}
+
+	close(pipes[1]);
+	// Dup the standard input as the output of our function call
+	dup2(0, pipes[0]);
+}
+
+int
+copy_file(const char * source, const char * destination)
+{
+	int err;
+	int fd_from= open(file_pathname, O_RDONLY);
+	if (fd_from == -1)
+		error("Errror on opening actual file");
+
+	// Unlink any existing copy
+	err = unlink(destination);
+	if (err == -1)
+		error("Error on unlinking local copy");
+
+	// Create destination copy
+	int fd_to = open(destination, O_CREAT | O_RDWR, 0766);
+	if (fd_to == -1)
+		error("Error on creating local copy");
+
+	ssize_t nread;
+	char buf[4096];
+
+	// 0 indicates EOF, -1 indicates error
+	while ( (nread = read(fd_from, buf, sizeof(buf))) > 0)
+    {
+        char *out_ptr = buf;
+        ssize_t nwritten;
+
+        nwritten = write(fd_to, out_ptr, nread);
+
+        if ( (nwritten == -1) || (nwritten!=nread) )
+        	error("Error on writing to destination file");
+    }
+
+    // Successfully reached end of file
+    if (nread == 0)
+    {
+      return 0;
+    }
+    //error
+    else
+    	error("Error on reading from source file");
+
+}

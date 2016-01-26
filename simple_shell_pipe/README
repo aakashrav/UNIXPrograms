@@ -1,0 +1,5 @@
+Easy exercise:
+
+Copy /etc/services to the current directory (using open(), read(), 
+write(), close()). Then simulate the command 
+"cat services | grep tcp | wc -l"
