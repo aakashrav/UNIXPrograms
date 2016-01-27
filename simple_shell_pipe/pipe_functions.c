@@ -10,7 +10,8 @@ error(const char * message)
 }
 
 void
-pipe_and_exec(int pipes[], const char * command, const char * command_input[])
+pipe_and_exec(int pipes[], const char * command, const char * command_input[],
+	int direct_output)
 {
 	pid_t pid = fork();
 
@@ -19,12 +20,16 @@ pipe_and_exec(int pipes[], const char * command, const char * command_input[])
 
 	if (pid == 0)
 	{
+		int i;
 		// Close the reader
 		close(pipes[0]);
-		// Duplicate standard output to the pipe
-		int i = dup2(1, pipes[1]);
-		if (i == -1)
-			error("Error on dup");
+		// Duplicate standard output to the pipe, if not direct outputting
+		if (!direct_output)
+		{
+			i = dup2(pipes[1],1);
+			if (i == -1)
+				error("Error on dup");
+		}
 
 		// Execute shell call
 		i = execve(command, command_input, NULL);
@@ -32,26 +37,21 @@ pipe_and_exec(int pipes[], const char * command, const char * command_input[])
 			error("Error on execve");
 
 		exit(0);
-
 	}
 
 	close(pipes[1]);
-	// Dup the standard input as the output of our function call
-	dup2(0, pipes[0]);
 }
 
 int
 copy_file(const char * source, const char * destination)
 {
 	int err;
-	int fd_from= open(file_pathname, O_RDONLY);
+	int fd_from= open(source, O_RDONLY);
 	if (fd_from == -1)
 		error("Errror on opening actual file");
 
-	// Unlink any existing copy
+	// Unlink any existing copy (if it exists)
 	err = unlink(destination);
-	if (err == -1)
-		error("Error on unlinking local copy");
 
 	// Create destination copy
 	int fd_to = open(destination, O_CREAT | O_RDWR, 0766);
