@@ -1,6 +1,6 @@
 #include "inetd_functions.h"
 
-void 
+void
 error(const char * message)
 {
 	perror(message);
@@ -8,8 +8,8 @@ error(const char * message)
 	exit(1);
 }
 
-int
-set_services_from_config(service_t * services, const char * config_file,
+service_t *
+set_services_from_config(const char * config_file,
 	int * total_services)
 {
 	int fd = open(config_file, O_RDONLY);
@@ -20,55 +20,99 @@ set_services_from_config(service_t * services, const char * config_file,
 	char * bf_ptr = buf;
 	memset(bf_ptr, 0, sizeof(buf));
 
+	/*
+	 * Not allowed to use any standard library functions to process file
+	 * so this gets kind of complicated, but works.
+	 */
+
 	ssize_t nread;
 	int num_services = 5;
 	int current_service = 0;
-	service_t * service_array = calloc(num_services, sizeof(struct service_structure));
+	service_t * services = calloc(num_services, sizeof(struct service_structure));
+	int port_or_service = 0;
+	char read_char_buf[1];
+	char * readchar = read_char_buf;
 
-	while ( (nread = read(fd, bf_ptr, sizeof(buf))) > 0)
+	while ( (nread = read(fd, readchar, 1) > 0))
 	{
-		if (current_service > num_services)
+		if (*readchar != '\n')
 		{
-			num_services += 5;
-			service_array = realloc(service_array, num_services);
+			strncat(bf_ptr, readchar, 1);
+			continue;
 		}
 
-		current_service++;
-		strncpy(service_array[current_service].port, bf_ptr, nread);
-		memset(bf_ptr, 0, sizeof(buf));
+		if ( (port_or_service % 2) == 0)
+		{
+			if (current_service > num_services)
+			{
+				num_services += 5;
+				services = realloc(services, num_services);
+			}
 
-		// Now get the service
-		nread = read(fd, bf_ptr, sizeof(buf));
-		if (nread <= 0)
-			break;
-		strncpy(service_array[current_service].service, bf_ptr, nread);
+			services[current_service].port = calloc(strlen(bf_ptr) +1, 1);
+			strcpy(services[current_service].port, bf_ptr);
+			printf("Read Port: %s\n", services[current_service].port);
+			fflush(stdout);
+			// Next read will be a service
+			port_or_service++;
+			memset(bf_ptr, 0, sizeof(buf));
+			continue;
+		}
+
+		if ( (port_or_service % 2) == 1)
+		{
+			services[current_service].service = calloc(strlen(bf_ptr)+1, 1);
+			strcpy(services[current_service].service, bf_ptr);
+
+			printf("Read Service: %s\n", services[current_service].service);
+			fflush(stdout);
+
+			memset(bf_ptr, 0, sizeof(buf));
+			port_or_service++;
+			current_service++;
+		}
+	}
+
+	//One final service copy, since we reached the end of file
+	if (strlen(bf_ptr) != 0)
+	{
+		services[current_service].service = calloc(strlen(bf_ptr)+1, 1);
+		strcpy(services[current_service].service, bf_ptr);
+
+		printf("Read Service: %s\n", services[current_service].service);
+		fflush(stdout);
+
 		memset(bf_ptr, 0, sizeof(buf));
+		port_or_service++;
+		current_service++;
 	}
 
 	if (nread == -1)
 		error("Error on reading config file");
 
-	*total_services = num_services;
-	return 0;
+	*total_services = current_service;
+	return services;
 
 }
 
-int
-initiate_all_services(service_t * services, struct pollfd * fds, int num_services)
+struct pollfd *
+initiate_all_services(service_t * services, int num_services)
 {
 	int err, fd;
 	struct addrinfo hints;struct addrinfo * res;struct addrinfo * res_original;
+	memset(&hints, 0, sizeof(struct addrinfo));
+
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 
-	fds = calloc(num_services, sizeof(struct pollfd));
-
-	memset(&hints, 0, sizeof(struct addrinfo));
+	struct pollfd * fds = calloc(num_services, sizeof(struct pollfd));
 
 	for (int i=0; i < num_services; i++)
-	{	
+	{
+		printf("%s\n", services[i].port);
+		fflush(stdout);
 		err = getaddrinfo("127.0.0.1", services[i].port, &hints, &res_original);
 		if (err)
 		{
@@ -122,5 +166,5 @@ initiate_all_services(service_t * services, struct pollfd * fds, int num_service
 
 	freeaddrinfo(res_original);
 	res_original = NULL;
-	return 0;
+	return fds;
 }

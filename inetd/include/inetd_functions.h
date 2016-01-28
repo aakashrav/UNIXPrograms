@@ -13,20 +13,19 @@
 #include <fcntl.h>
 #include <poll.h>
 
-void 
+void
 error(const char * message);
 
 typedef struct service_structure {
 	char * service;
-	char * port; 
+	char * port;
 } service_t;
 
-int
-set_services_from_config(service_t * services, const char * config_file,
+service_t *
+set_services_from_config(const char * config_file,
 	int * total_services);
 
-int
-initiate_all_services(service_t * serv_struct, struct pollfd * fds, int num_services);
+struct pollfd *
+initiate_all_services(service_t * serv_struct, int num_services);
 
 #endif
-

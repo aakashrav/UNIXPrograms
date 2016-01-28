@@ -3,6 +3,20 @@
 
 const char * config_file = "config_file";
 
+void
+free_service_structures(service_t * services, int num_services)
+{
+	for (int i=0; i < num_services; i++)
+	{
+		free(services[i].port);
+		services[i].port = NULL;
+		free(services[i].service);
+		services[i].service = NULL;
+	}
+	free(services);
+	services = NULL;
+}
+
 int
 main(int argc, char * argv[])
 {
@@ -10,10 +24,10 @@ main(int argc, char * argv[])
 	service_t * services = NULL;
 	int num_services;
 
-	set_services_from_config(services, config_file, &num_services);
+	services = set_services_from_config(config_file, &num_services);
 
 	struct pollfd * fds = NULL;
-	initiate_all_services(services, fds, num_services);
+	fds=initiate_all_services(services, num_services);
 
 	while(1)
 	{
@@ -44,6 +58,7 @@ main(int argc, char * argv[])
 					//Entire process space is copied, so just retreive the pointer from heap
 					char buf[4096];
 					char * buf_ptr = buf;
+					memset(buf_ptr, 0, sizeof(buf));
 					//Read in arguments from client
 					ssize_t nread;
 					nread = read(client_fd, buf_ptr, sizeof(buf));
@@ -53,12 +68,17 @@ main(int argc, char * argv[])
 						write(client_fd, err_msg, strlen(err_msg));
 						error("Error on read");
 					}
-
+					// Remove trailing newline
+					strtok(buf_ptr, "\n");
 					char * args[] = {services[i].service, buf_ptr, NULL};
+					// char * args[] = {"/bin/cat", "main.c", NULL};
 					dup2(client_fd, 1);
-					err = execve(services[i].service, args, NULL);
+					err = execve("/bin/cat", args, NULL);
+					// err = execve("/bin/cat", args, NULL);
 					if (err == -1)
+					{
 						error("Error on execve!");
+					}
 				}
 
 				int status;
@@ -73,8 +93,7 @@ main(int argc, char * argv[])
 	}
 
 
-	free(services);
-	services = NULL;
+	free_service_structures(services, num_services);
 	free(fds);
 	fds = NULL;
 }

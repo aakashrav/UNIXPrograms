@@ -1,7 +1,7 @@
 SOURCES=inetd_functions.c main.c
 OBJECTS=$(SOURCES:.c=.o)
 CC=gcc
-CFLAGS=-c -Wall -std=gnu99 -I./include -MP -MMD
+CFLAGS=-c -g -Wall -std=gnu99 -I./include -MP -MMD
 
 all: inetd_server
 
