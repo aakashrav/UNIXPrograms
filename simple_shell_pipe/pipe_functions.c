@@ -10,7 +10,7 @@ error(const char * message)
 }
 
 void
-pipe_and_exec(int pipes[], const char * command, const char * command_input[],
+pipe_and_exec(int pipes[], const char * command, char * const command_input[],
 	int direct_output)
 {
 	pid_t pid = fork();
@@ -81,5 +81,7 @@ copy_file(const char * source, const char * destination)
     //error
     else
     	error("Error on reading from source file");
+
+    return 0;
 
 }

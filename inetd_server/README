@@ -1,0 +1,22 @@
+Assignment:
+
+Write an inetd server for TCP services. The configuration file looks 
+like:
+
+2222
+/bin/cat
+3331
+/bin/sed
+3332
+...
+...
+...
+
+
+Server is listening on all given ports together (using either select() 
+or poll()), after a connection is accept on any of the ports it spawns 
+new process, its file descriptors 0, 1 and 2 connects to the new socket 
+and calls exec() on the program. You can expect that the programs don't 
+have any other arguments. After each accept() clear the zombies if any 
+exist. You can process the configuration file using only read(), open(), 
+close().

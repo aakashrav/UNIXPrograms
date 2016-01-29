@@ -11,7 +11,7 @@ void
 error(const char * message);
 
 void
-pipe_and_exec(int pipes[], const char * command, const char * command_input[],
+pipe_and_exec(int pipes[], const char * command, char * const command_input[],
 	int direct_output);
 
 int

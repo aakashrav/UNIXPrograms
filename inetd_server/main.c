@@ -59,6 +59,7 @@ main(int argc, char * argv[])
 					char buf[4096];
 					char * buf_ptr = buf;
 					memset(buf_ptr, 0, sizeof(buf));
+
 					//Read in arguments from client
 					ssize_t nread;
 					nread = read(client_fd, buf_ptr, sizeof(buf));
@@ -68,13 +69,16 @@ main(int argc, char * argv[])
 						write(client_fd, err_msg, strlen(err_msg));
 						error("Error on read");
 					}
-					// Remove trailing newline
-					strtok(buf_ptr, "\n");
-					char * args[] = {services[i].service, buf_ptr, NULL};
-					// char * args[] = {"/bin/cat", "main.c", NULL};
+
+					// Usually have trailing newline or carriage return, so remove it
+					buf_ptr[strlen(buf_ptr)-1]= '\0';
+					char dest_string[strlen(buf_ptr)];
+					char * dest = dest_string;
+					strncpy(dest, buf_ptr, strlen(buf_ptr) -1);
+
+					char * args[] = {services[i].service, dest, NULL};
 					dup2(client_fd, 1);
-					err = execve("/bin/cat", args, NULL);
-					// err = execve("/bin/cat", args, NULL);
+					err = execve(services[i].service, args, NULL);
 					if (err == -1)
 					{
 						error("Error on execve!");

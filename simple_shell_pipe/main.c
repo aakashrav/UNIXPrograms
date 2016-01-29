@@ -16,7 +16,7 @@ main(int argc, char * argv[])
 		error("Error on creation of pipe");
 
 	// First command
-	const char * args[] = {"cat", "services", NULL};
+	char * const args[] = {"cat", "services", NULL};
 	pipe_and_exec(pipes,"/bin/cat", args,0);
 	// Dup the standard input as the reader side of the pipe
 	err = dup2(pipes[0],0);
@@ -29,7 +29,7 @@ main(int argc, char * argv[])
 	err = pipe(grep_pipe);
 	if (err == -1)
 		error("Error on creation of grep pipe");
-	const char * args2[] = {"grep", "tcp", NULL};
+	char * const args2[] = {"grep", "tcp", NULL};
 	pipe_and_exec(grep_pipe, "/usr/bin/grep", args2,0);
 	// Dup the standard input as the reader side of the pipe
 	err = dup2(grep_pipe[0],0);
@@ -41,7 +41,7 @@ main(int argc, char * argv[])
 	err = pipe(wc_pipe);
 	if (err == -1)
 		error("Error on creation of wc pipe");
-	const char * args3[] = {"wc", "-l", NULL};
+	char * const args3[] = {"wc", "-l", NULL};
 	pipe_and_exec(grep_pipe, "/usr/bin/wc", args3,1);
 
 
