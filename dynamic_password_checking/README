@@ -1,0 +1,22 @@
+""Create a library libpwq for checking of a quality of passwords. Allow 
+the library to be easily extended with plugins and create at least one 
+plugin. Create a program using the library."""
+
+For example suppose this is the API of the library:
+open(plugin_data **, dictionary *)
+check(pluging_data *, password, username)
+close(plugin_data *)
+
+The program ask the library to initiate itself through the open() call 
+using provided dictionary of bad passwords, then it can check a 
+user&password pairs if they are "good" through the call of check().
+The library should load all the plugins and verify the password is 
+considered as "good" by all of them. The plugins could be:
+  - length (password is long enough)
+  - dict (password is not in a dictionary)
+  - char_classes (there are enough different characters)
+  - username (the password != username)
+
+Each plugin should contain a well-known structure variable pwq_vt which 
+contains pointers to all functions supported by the plugin (check(), ...).
+""

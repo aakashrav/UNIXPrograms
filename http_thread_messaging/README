@@ -1,0 +1,27 @@
+Write a program which will spawn given number of threads, each thread will
+perform TCP connection to given host on given port, write couple of bytes
+(typically "GET /" + some HTTP headers), read from the other side
+until it receives EOF and exit.
+The main thread will keep the number of threads running constant, i.e. if
+one
+thread exits it will spawn another one. The main thread will be passing each
+thread hostname and port to connect to. (variation: main thread
+manages a queue of requests)
+The main thread will be waiting for *any* thread, i.e. it will not use
+pthread_join() but rather condition varibles to observe the event of thread
+exiting.
+The format of the input file will be as follows:
+
+  IPADDR1#PORT1
+  IPADDR2#PORT2
+  ...
+
+(variation: read the list of files from stdin)
+
+Usage: a.out -n <number_of_threads> -f <input_file>
+
+plus points: handle SIGUSR1 and report number of connections performed so
+far
+             (successful or not) and total number of transferred bytes - for
+             each thread. The same is reported after the list is exhausted
+             and the main program exits.
