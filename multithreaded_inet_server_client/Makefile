@@ -12,11 +12,11 @@ all: inet_client inet_server
 
 inet_client: $(OBJECTS_CLIENT)
 	@$(CC) -o $@ $(OBJECTS_CLIENT)
-	@echo Compiled inet client!
+	@echo Created inet client!
 
 inet_server: $(OBJECTS_SERVER)
 	@$(CC) -o $@ $(OBJECTS_SERVER)
-	@echo Compiled inet server!
+	@echo Created inet server!
 
 clean:
 	-rm inet_client inet_server
