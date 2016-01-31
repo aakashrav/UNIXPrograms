@@ -1,0 +1,6 @@
+Write an INET server & client. Client reads a signal number + port 
+from its arguments, connects to the server on localhost on given port 
+(using TCP) and sends his pid & signal to the server. Server then sends 
+given signal to the given pid and prints this message on screen. Client 
+catches the signal, prints the message and ends. Server can be single 
+threaded calling just accept().
