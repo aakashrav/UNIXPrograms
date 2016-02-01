@@ -16,7 +16,8 @@ main(int argc, char * argv[])
 	const int sig = atoi(argv[2]);
 
 	err = send_signal_to_server(port, sig);
-
+	if (err!=0)
+		error("Error on sending signal to server!");
 	/*
 	 * We first must block the signal that we want to receive to prevent the
 	 * default handler from getting run. The blocked signal will then get put in our

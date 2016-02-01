@@ -52,6 +52,11 @@ copy_file(const char * source, const char * destination)
 
 	// Unlink any existing copy (if it exists)
 	err = unlink(destination);
+	if (err == -1)
+	{
+		printf("No local service copy exists, creating one now..");
+		fflush(stdout);
+	}
 
 	// Create destination copy
 	int fd_to = open(destination, O_CREAT | O_RDWR, 0766);
