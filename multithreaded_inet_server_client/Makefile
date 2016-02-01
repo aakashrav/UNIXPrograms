@@ -15,7 +15,7 @@ inet_client: $(OBJECTS_CLIENT)
 	@echo Created inet client!
 
 inet_server: $(OBJECTS_SERVER)
-	@$(CC) -o $@ $(OBJECTS_SERVER)
+	@$(CC) -o $@ -pthread $(OBJECTS_SERVER)
 	@echo Created inet server!
 
 clean:
