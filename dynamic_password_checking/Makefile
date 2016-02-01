@@ -4,11 +4,12 @@ TESTER_OBJECTS=$(TESTER_SOURCES:.c=.o)
 CC=gcc
 CFLAGS=-Wall -std=c99 -I./include/ -MP -MMD
 LDLFLAGS=-ldl -lpassword_checker
+ORIGIN=$(PWD)
 
 all: libraries tester
 
 tester: $(TESTER_SOURCES) libraries
-	$(CC) $(CFLAGS) -o $@ $< -L./lib/ $(LDLFLAGS)
+	$(CC) $(CFLAGS) -o $@ $< -L./lib/ -Wl,-rpath=$(ORIGIN)/lib $(LDLFLAGS)
 	@echo finished building tester!
 
 libraries:
